@@ -4,6 +4,7 @@ import Welcome from "@/views/Welcome";
 import Error404 from "@/views/404";
 import Error403 from '@/views/403'
 import Layout from "@/layout";
+import Dashboard from "@/views/Dashboard";
 const router:RouteObject[] = [
 	{
 		path:'/',
@@ -19,7 +20,11 @@ const router:RouteObject[] = [
 			{
 				path:'/welcome',
 				element:<Welcome/>
-			}
+			},
+				{
+				path:'/dashboard',
+				element:<Dashboard/>
+			},
 		]
 	},
 	{
