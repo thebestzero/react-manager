@@ -51,6 +51,7 @@ export namespace User {
     createId: number
     deptName: string
     userImg: string
+    createTime?: string
   }
   export interface CreateParams {
     userName: string

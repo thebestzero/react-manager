@@ -4,13 +4,15 @@ import stroage from '@/utils/stroage'
 import { Result } from '@/types/api'
 import { message } from '@/utils/AntdGlobal'
 import { hideLoading, showLoading } from '@/utils/loading'
-
+import { debounce } from '@/utils'
 const instance = axios.create({
   timeout: 8000,
   timeoutErrorMessage: '请求超时，请稍后再试',
   withCredentials: true
 })
-
+const successTip = debounce(() => {
+  message.success('success')
+})
 instance.interceptors.request.use(
   request => {
     if (request.showLoading) showLoading()
@@ -32,9 +34,9 @@ instance.interceptors.response.use(
   response => {
     hideLoading()
     const data: Result = response.data
-		if (data.code === 0){
-			message.success('success')
-		}
+    if (data.code === 0) {
+      successTip()
+    }
     if (data.code === 500001) {
       message.error(data.msg)
       stroage.remove('token')
