@@ -7,7 +7,6 @@ import { Simulate } from 'react-dom/test-utils'
 import severApi from '@/api'
 import error = Simulate.error
 import { message } from '@/utils/AntdGlobal'
-
 const CreateUser = (props: IModalProp) => {
   const [form] = useForm()
   const [visible, setVisible] = useState(false)

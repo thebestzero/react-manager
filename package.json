@@ -13,6 +13,7 @@
 		"@ant-design/icons": "^5.3.6",
 		"@types/mockjs": "^1.0.10",
 		"@types/node": "^20.12.2",
+		"ahooks": "^3.7.11",
 		"antd": "^5.16.0",
 		"axios": "^1.6.8",
 		"echarts": "^5.5.0",

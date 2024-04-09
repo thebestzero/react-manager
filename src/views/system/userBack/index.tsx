@@ -7,10 +7,15 @@ import { formatDate } from '@/utils'
 import CreateUser from '@/views/system/user/CreateUser'
 import { IAction } from '@/types/modal'
 import { message } from '@/utils/AntdGlobal'
-import { useAntdTable } from 'ahooks'
 
 export default function UserList() {
   const [form] = Form.useForm()
+  const [dataSource, setDataSource] = useState<User.UserItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10
+  })
   const [userIds, setUserIds] = useState<number[]>([])
   const modalRef = useRef<{
     open: (type: IAction, data?: User.UserItem) => void
@@ -82,25 +87,17 @@ export default function UserList() {
     }
   ]
 
-  const getTableData = ({ current, pageSize }: { current: number; pageSize: number }, formData: User.Params) => {
-    return serverApi
-      .getUserList({
-        ...formData,
-        pageNum: current,
-        pageSize
-      })
-      .then(data => {
-        return {
-          total: data.page.total,
-          list: data.list
-        }
-      })
+  const getUserList = async (params: PageParams) => {
+    const formState = form.getFieldsValue()
+    const data = await serverApi.getUserList({ ...formState,
+			pageNum: params.pageNum, pageSize: params.pageSize || pagination.pageSize })
+    setDataSource(data.list)
+    setTotal(data.page.total)
+    setPagination({
+      current: data.page.pageNum,
+      pageSize: data.page.pageSize
+    })
   }
-  const { tableProps, search } = useAntdTable(getTableData, {
-    defaultCurrent: 1,
-    defaultPageSize: 10,
-    form
-  })
   // 公共删除用户接口
   const handleUserDelSubmit = async (ids: number[]) => {
     try {
@@ -113,6 +110,12 @@ export default function UserList() {
     } catch (error) {
       console.log(error)
     }
+  }
+  const handleSearch = () => {
+    getUserList({ pageNum: 1 })
+  }
+  const handleReset = () => {
+    form.resetFields()
   }
   const handleAddUser = () => {
     modalRef.current?.open('create')
@@ -143,6 +146,9 @@ export default function UserList() {
       }
     })
   }
+  useEffect(() => {
+    getUserList({ pageNum: 1})
+  }, [])
   return (
     <div className='user-list'>
       <Form className='search-form' layout='inline' form={form} initialValues={{ userId: '', userName: '', state: 0 }}>
@@ -163,16 +169,12 @@ export default function UserList() {
             ]}
           />
         </Form.Item>
-        <Form.Item>
-          <Space>
-            <Button type='primary' onClick={() => search.submit()}>
-              搜索
-            </Button>
-            <Button type='primary' onClick={() => search.reset()}>
-              重置
-            </Button>
-          </Space>
-        </Form.Item>
+        <Button type='primary' onClick={handleSearch} style={{ marginRight: '10px' }}>
+          搜索
+        </Button>
+        <Button type='primary' onClick={handleReset}>
+          重置
+        </Button>
       </Form>
       <div className='base-table'>
         <div className='header-wrapper'>
@@ -187,6 +189,7 @@ export default function UserList() {
           </div>
         </div>
         <Table
+          dataSource={dataSource}
           columns={columns}
           rowKey='userId'
           bordered
@@ -197,14 +200,24 @@ export default function UserList() {
               setUserIds(selectedRowKeys as number[])
             }
           }}
-          {...tableProps}
-          loading={false}
+          pagination={{
+            position: ['bottomRight'],
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: total,
+            showQuickJumper: true,
+            showSizeChanger: true,
+            showTotal: total => `总共 ${total} 条`,
+            onChange: (current, pageSize) => {
+              setPagination({ current, pageSize })
+            }
+          }}
         />
       </div>
       <CreateUser
         modalRef={modalRef}
         updateList={() => {
-          search.reset()
+          getUserList({ pageNum: 1 })
         }}
       />
     </div>
