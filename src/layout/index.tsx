@@ -15,6 +15,8 @@ const App: React.FC = () => {
     const data = await serverApi.getUserInfo()
     updateUserInfo(data)
   }
+
+
   useEffect(() => {
     getUserInfo()
   }, [])

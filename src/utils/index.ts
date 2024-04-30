@@ -1,3 +1,5 @@
+import { Menu } from '@/types/api'
+
 /**
  * 工具函数封装
  */
@@ -70,4 +72,10 @@ export function debounce<T extends (...args: any[]) => void>(fn: T, delay: numbe
       timer = null
     }, delay)
   } as unknown as T
+}
+
+export const getMenuPath = (list: Menu.MenuItem[]): string[] => {
+  return list.reduce((result:string[], item) => {
+    return result.concat(Array.isArray(item.children) && !item.buttons ? getMenuPath(item.children) : (item.path + ''))
+  }, [])
 }

@@ -6,6 +6,11 @@ import Error403 from '@/views/403'
 import Layout from '@/layout'
 import Dashboard from '@/views/Dashboard'
 import User from '@/views/system/user'
+import Dept from '@/views/system/dept'
+import Menu from '@/views/system/menu'
+import Role from '@/views/system/role'
+import AuthLoader from '@/router/AuthLoader'
+
 const router: RouteObject[] = [
   {
     path: '/',
@@ -16,7 +21,9 @@ const router: RouteObject[] = [
     element: <Login />
   },
   {
+    id: 'layout',
     element: <Layout />,
+    loader: AuthLoader,
     children: [
       {
         path: '/welcome',
@@ -29,6 +36,18 @@ const router: RouteObject[] = [
       {
         path: '/userList',
         element: <User />
+      },
+      {
+        path: '/deptList',
+        element: <Dept />
+      },
+      {
+        path: '/menuList',
+        element: <Menu />
+      },
+      {
+        path: '/roleList',
+        element: <Role />
       }
     ]
   },
