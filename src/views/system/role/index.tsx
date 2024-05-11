@@ -8,11 +8,15 @@ import CreateUser from '@/views/system/user/CreateUser'
 import { IAction } from '@/types/modal'
 import { message } from '@/utils/AntdGlobal'
 import { useAntdTable } from 'ahooks'
-import CreatRole from "@/views/system/role/CreatRole";
+import CreatRole from '@/views/system/role/CreatRole'
+import SetPermission from '@/views/system/role/SetPermission'
 export default function UserList() {
   const [form] = Form.useForm()
   const [userIds, setUserIds] = useState<number[]>([])
   const modalRef = useRef<{
+    open: (type: IAction, data?: Role.RoleItem) => void
+  }>()
+  const permissionRef = useRef<{
     open: (type: IAction, data?: Role.RoleItem) => void
   }>()
   const columns: ColumnsType<Role.RoleItem> = [
@@ -48,9 +52,13 @@ export default function UserList() {
       render(record: Role.RoleItem) {
         return (
           <Space>
-            <Button type='text' onClick={()=>handleEdit(record)}>编辑</Button>
-            <Button type='text'>设置权限</Button>
-            <Button type='text' danger onClick={()=>handleDel(record._id)}>
+            <Button type='text' onClick={() => handleEdit(record)}>
+              编辑
+            </Button>
+            <Button type='text' onClick={() => handlePermission(record)}>
+              设置权限
+            </Button>
+            <Button type='text' danger onClick={() => handleDel(record._id)}>
               删除
             </Button>
           </Space>
@@ -78,24 +86,27 @@ export default function UserList() {
     form
   })
 
-	// event
-	const handleCreate = () => {
-			modalRef.current?.open('create')
-	}
-	const handleEdit = (data:Role.RoleItem) => {
-		modalRef.current?.open('edit',data)
-	}
-	const handleDel = (_id:string) => {
-			Modal.confirm({
-				title:'确认',
-				content:<span>确认删除该角色吗？</span>,
-				async onOk(){
-					await serverApi.delRole({_id})
-					message.success('删除成功')
-					search.submit()
-				}
-			})
-	}
+  // event
+  const handleCreate = () => {
+    modalRef.current?.open('create')
+  }
+  const handleEdit = (data: Role.RoleItem) => {
+    modalRef.current?.open('edit', data)
+  }
+  const handlePermission = (data: Role.RoleItem) => {
+    permissionRef.current?.open('edit', data)
+  }
+  const handleDel = (_id: string) => {
+    Modal.confirm({
+      title: '确认',
+      content: <span>确认删除该角色吗？</span>,
+      async onOk() {
+        await serverApi.delRole({ _id })
+        message.success('删除成功')
+        search.submit()
+      }
+    })
+  }
   return (
     <div className='user-list'>
       <Form className='search-form' layout='inline' form={form} initialValues={{ userId: '', userName: '', state: 0 }}>
@@ -115,14 +126,17 @@ export default function UserList() {
       </Form>
       <div className='base-table'>
         <div className='header-wrapper'>
-          <div className='title'>角色</div>
+          <div className='title'>角色列表</div>
           <div className='action'>
-            <Button type='primary' onClick={handleCreate}>新增</Button>
+            <Button type='primary' onClick={handleCreate}>
+              新增
+            </Button>
           </div>
         </div>
         <Table columns={columns} rowKey='_id' bordered {...tableProps} />
       </div>
-			<CreatRole modalRef={modalRef} updateList={search.submit} />
+      <CreatRole modalRef={modalRef} updateList={search.submit} />
+      <SetPermission modalRef={permissionRef} updateList={search.submit} />
     </div>
   )
 }

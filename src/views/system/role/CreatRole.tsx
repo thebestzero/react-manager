@@ -1,8 +1,11 @@
-import { Form, Input, Modal } from 'antd'
+import {Form, Input, Modal} from 'antd'
 import { useImperativeHandle, useState } from 'react'
 import { useForm } from 'antd/es/form/Form'
 import { IAction, IModalProp } from '@/types/modal'
 import { Role } from '@/types/api'
+import api from "@/api/roleApi";
+import {message} from "@/utils/AntdGlobal";
+
 export default function (prop: IModalProp<Role.RoleItem>) {
   const [form] = useForm()
   const [visible, setVisible] = useState(false)
@@ -18,7 +21,20 @@ export default function (prop: IModalProp<Role.RoleItem>) {
     setAction(type)
     if (data) form.setFieldsValue(data)
   }
-  const handleOk = () => {}
+  const handleOk = async () => {
+    const valid = await form.validateFields()
+    if (valid) {
+      const params = form.getFieldsValue()
+      if (action === 'create') {
+        await api.createRole(params)
+      } else {
+        await api.editRole(params)
+      }
+      message.success('操作成功')
+      handleCancel()
+      prop.updateList()
+    }
+  }
   const handleCancel = () => {
     setVisible(false)
   }
@@ -32,7 +48,7 @@ export default function (prop: IModalProp<Role.RoleItem>) {
       onOk={handleOk}
       onCancel={handleCancel}
     >
-      <Form form={form} labelAlign='right' labelCol={{span:4}}>
+      <Form form={form} labelAlign='right' labelCol={{ span: 4 }}>
         <Form.Item name='_id' hidden></Form.Item>
         <Form.Item name='roleName' label='角色'>
           <Input placeholder='请输入角色'></Input>

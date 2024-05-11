@@ -1,9 +1,10 @@
 import React from 'react'
 import { MenuFoldOutlined } from '@ant-design/icons'
-import { Breadcrumb, Dropdown, MenuProps, Switch } from 'antd'
+import { Dropdown, MenuProps, Switch } from 'antd'
+import Breadcrumb from './Bread'
 import style from './index.module.less'
 import { useStore } from '@/store'
-import stroage from "@/utils/stroage";
+import stroage from '@/utils/stroage'
 
 const NavHeader: React.FC = () => {
   const userInfo = useStore(state => state.userInfo)
@@ -13,7 +14,7 @@ const NavHeader: React.FC = () => {
   ]
   const dropClick: MenuProps['onClick'] = ({ key }) => {
     if (key === 'logout') {
-			stroage.remove('token')
+      stroage.remove('token')
       location.href = '/login?callback=' + encodeURIComponent(location.href)
     }
   }
@@ -21,22 +22,7 @@ const NavHeader: React.FC = () => {
     <div className={style.navHeader}>
       <div className={style.left}>
         <MenuFoldOutlined />
-        <Breadcrumb
-          items={[
-            {
-              title: 'Home'
-            },
-            {
-              title: <a href=''>Application Center</a>
-            },
-            {
-              title: <a href=''>Application List</a>
-            },
-            {
-              title: 'An Application'
-            }
-          ]}
-        />
+        <Breadcrumb />
       </div>
       <div className={style.right}>
         <Switch checkedChildren='暗黑' unCheckedChildren='默认'></Switch>

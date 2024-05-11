@@ -1,10 +1,11 @@
-import { Form, Input, Modal, Select } from 'antd'
+import { Form, Input, Modal, Select, TreeSelect } from 'antd'
 import { useForm } from 'antd/es/form/Form'
 import { IAction, IModalProp } from '@/types/modal'
-import { useImperativeHandle, useState } from 'react'
-import { User } from '@/types/api'
+import { useEffect, useImperativeHandle, useState } from 'react'
+import { Dept, Role, User } from '@/types/api'
 import { Simulate } from 'react-dom/test-utils'
 import severApi from '@/api'
+import roleApi from '@/api/roleApi'
 import error = Simulate.error
 import { message } from '@/utils/AntdGlobal'
 
@@ -12,7 +13,8 @@ const CreateUser = (props: IModalProp) => {
   const [form] = useForm()
   const [visible, setVisible] = useState(false)
   const [action, setAction] = useState<IAction>('create')
-
+  const [deptList, setDeptList] = useState<Dept.DeptItem[]>([])
+  const [roleList, setRoleList] = useState<Role.RoleItem[]>([])
   // 暴露子组件open方法
   useImperativeHandle(props.modalRef, () => {
     return {
@@ -46,6 +48,24 @@ const CreateUser = (props: IModalProp) => {
     setVisible(false)
     form.resetFields()
   }
+
+  useEffect(() => {
+    getDeptList()
+    getRoleList()
+  }, [])
+
+  // 获取部门列表
+  const getDeptList = async () => {
+    const list = await severApi.getDeptList()
+    setDeptList(list)
+  }
+
+  // 获取角色列表
+  const getRoleList = async () => {
+    const list = await roleApi.getAllRoleList()
+    setRoleList(list)
+  }
+
   return (
     <Modal
       title={action === 'create' ? '创建用户' : '编辑用户'}
@@ -104,7 +124,14 @@ const CreateUser = (props: IModalProp) => {
             }
           ]}
         >
-          <Input placeholder='部门'></Input>
+          <TreeSelect
+            treeData={deptList}
+            fieldNames={{ label: 'deptName', value: '_id' }}
+            placeholder='请选择部门'
+            allowClear
+            treeDefaultExpandAll
+            showCheckedStrategy={TreeSelect.SHOW_ALL}
+          />
         </Form.Item>
         <Form.Item label='岗位' name='job'>
           <Input placeholder='请输入岗位'></Input>
@@ -117,7 +144,7 @@ const CreateUser = (props: IModalProp) => {
           </Select>
         </Form.Item>
         <Form.Item label='系统角色' name='roleList'>
-          <Input placeholder='系统角色'></Input>
+          <Select options={roleList} fieldNames={{ label: 'roleName', value: '_id' }}></Select>
         </Form.Item>
       </Form>
     </Modal>

@@ -4,14 +4,11 @@ import Welcome from '@/views/Welcome'
 import Error404 from '@/views/404'
 import Error403 from '@/views/403'
 import Layout from '@/layout'
-import Dashboard from '@/views/Dashboard'
-import User from '@/views/system/user'
-import Dept from '@/views/system/dept'
-import Menu from '@/views/system/menu'
-import Role from '@/views/system/role'
 import AuthLoader from '@/router/AuthLoader'
+import { lazyLoad } from '@/router/lazyLoad'
+import React from 'react'
 
-const router: RouteObject[] = [
+export const router: RouteObject[] = [
   {
     path: '/',
     element: <Navigate to={'/welcome'} />
@@ -31,23 +28,27 @@ const router: RouteObject[] = [
       },
       {
         path: '/dashboard',
-        element: <Dashboard />
+        element: lazyLoad(React.lazy(() => import('@/views/Dashboard')))
       },
       {
         path: '/userList',
-        element: <User />
+        element: lazyLoad(React.lazy(() => import('@/views/system/user')))
       },
       {
         path: '/deptList',
-        element: <Dept />
+        element: lazyLoad(React.lazy(() => import('@/views/system/dept')))
       },
       {
         path: '/menuList',
-        element: <Menu />
+        element: lazyLoad(React.lazy(() => import('@/views/system/menu')))
       },
       {
         path: '/roleList',
-        element: <Role />
+        element: lazyLoad(React.lazy(() => import('@/views/system/role')))
+      },
+      {
+        path: '/orderlist',
+        element: lazyLoad(React.lazy(() => import('@/views/order/OrderList')))
       }
     ]
   },
